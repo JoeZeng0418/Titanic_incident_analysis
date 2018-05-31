@@ -75,17 +75,76 @@ for (i in 1:nrow(data_combined)) {
 data_combined$Title <- as.factor(titles)
 # plot the relationship among survival, pclass, and title
 ggplot(data_combined[1:nrow(trainData),], aes(x = Title, fill=Survived))+
-  geom_bar(width = 0.5)+ggtitle("Pclass")+facet_wrap(~Pclass)
+  geom_bar(width = 0.5)+ggtitle("Pclass")+facet_wrap(~Pclass)+
    xlab("Title")+ylab("Count")+labs(fill="Survived")
 
+#plot the relationship among sex, pclass, and survival
+ggplot(data_combined[1:nrow(trainData),], aes(x = Sex, fill=Survived))+
+  geom_bar(width = 0.5)+ggtitle("Pclass")+facet_wrap(~Pclass)+
+  xlab("Sex")+ylab("Count")+labs(fill="Survived")
 
+summary(data_combined$Age)
 
+#plot the relationship among sex, pclass, age and survival
+ggplot(data_combined[1:nrow(trainData),], aes(x = Age, fill=Survived))+
+  geom_histogram(binwidth = 10)+ggtitle("Pclass")+facet_wrap(~Sex+Pclass)+
+  xlab("Age")+ylab("Count")+labs(fill="Survived")
 
+# validate master as boys
+boys <- data_combined[which(data_combined$Title=="Master."),]
+summary(boys$Age)
 
+misses <- data_combined[which(data_combined$Title=="Miss."),]
+summary(misses$Age)
 
+# survival vs. age of Miss by Pclass
+ggplot(misses[misses$Survived!="None",], aes(x = Age, fill=Survived))+
+  facet_wrap(~Pclass)+geom_histogram(binwidth = 5)+ggtitle("Age for 'Miss.' by Pclass")+xlab("Age")+ylab("count")
 
+# female children situation
+female_children = misses[which(misses$SibSp==0&misses$Parch==0),]
+summary(female_children$Age)
+length(which(female_children$Age<=14.5))
 
+# examine sibsp varaible
+summary(data_combined$SibSp)
 
+# make the sibsp a factor
+length(unique(data_combined$SibSp))
+data_combined$SibSp <- as.factor(data_combined$SibSp)
+
+ggplot(data_combined[1:nrow(trainData),], aes(x = SibSp, fill=Survived))+
+  geom_bar()+
+  facet_wrap(~Pclass+Title)+
+  ggtitle("Pclass, Title")+
+  xlab("SibSp")+
+  ylab("count")+
+  ylim(0,300)+
+  labs(fill="Survived")
+
+# make the parch a factor
+length(unique(data_combined$Parch))
+data_combined$Parch <- as.factor(data_combined$Parch)
+
+ggplot(data_combined[1:nrow(trainData),], aes(x = Parch, fill=Survived))+
+  geom_bar()+
+  facet_wrap(~Pclass+Title)+
+  ggtitle("Pclass, Title")+
+  xlab("Parch")+
+  ylab("count")+
+  ylim(0,300)+
+  labs(fill="Survived")
+
+# add a family size feature
+data_combined$FamilySize <- as.factor(c(trainData$SibSp,testData$SibSp)+c(trainData$Parch,testData$Parch)+1)
+ggplot(data_combined[1:nrow(trainData),], aes(x = FamilySize, fill=Survived))+
+  geom_bar()+
+  facet_wrap(~Pclass+Title)+
+  ggtitle("Pclass, Title")+
+  xlab("FamilySize")+
+  ylab("count")+
+  ylim(0,300)+
+  labs(fill="Survived")
 
 
 
